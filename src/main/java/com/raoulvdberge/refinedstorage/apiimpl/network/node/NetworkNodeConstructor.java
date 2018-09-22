@@ -6,6 +6,8 @@ import com.raoulvdberge.refinedstorage.api.util.Action;
 import com.raoulvdberge.refinedstorage.api.util.IComparer;
 import com.raoulvdberge.refinedstorage.apiimpl.network.node.cover.CoverManager;
 import com.raoulvdberge.refinedstorage.container.slot.filter.SlotFilter;
+import com.raoulvdberge.refinedstorage.integration.mcmp.IntegrationMCMP;
+import com.raoulvdberge.refinedstorage.integration.mcmp.RSMCMPAddon;
 import com.raoulvdberge.refinedstorage.inventory.fluid.FluidInventory;
 import com.raoulvdberge.refinedstorage.inventory.item.ItemHandlerBase;
 import com.raoulvdberge.refinedstorage.inventory.item.ItemHandlerUpgrade;
@@ -146,7 +148,7 @@ public class NetworkNodeConstructor extends NetworkNode implements IComparable, 
     }
 
     private boolean canPlace(BlockPos pos, IBlockState state) {
-        BlockEvent.PlaceEvent e = new BlockEvent.PlaceEvent(new BlockSnapshot(world, pos, state), world.getBlockState(pos), FakePlayerFactory.getMinecraft((WorldServer) world), EnumHand.MAIN_HAND);
+        BlockEvent.PlaceEvent e = new BlockEvent.PlaceEvent(new BlockSnapshot(world, pos, state), world.getBlockState(pos), FakePlayerFactory.getMinecraft(getWorldServer()), EnumHand.MAIN_HAND);
 
         return !MinecraftForge.EVENT_BUS.post(e);
     }
@@ -162,7 +164,7 @@ public class NetworkNodeConstructor extends NetworkNode implements IComparable, 
             IBlockState state = SlotFilter.getBlockState(world, front, took);
 
             if (state != null && world.isAirBlock(front) && state.getBlock().canPlaceBlockAt(world, front)) {
-                state = state.getBlock().getStateForPlacement(world, front, getDirection(), 0.5F, 0.5F, 0.5F, took.getMetadata(), FakePlayerFactory.getMinecraft((WorldServer) world), EnumHand.MAIN_HAND);
+                state = state.getBlock().getStateForPlacement(world, front, getDirection(), 0.5F, 0.5F, 0.5F, took.getMetadata(), FakePlayerFactory.getMinecraft(getWorldServer()), EnumHand.MAIN_HAND);
 
                 if (!canPlace(front, state)) {
                     return;
@@ -174,7 +176,7 @@ public class NetworkNodeConstructor extends NetworkNode implements IComparable, 
                     if (item.getItem() instanceof ItemBlock) {
                         ((ItemBlock) item.getItem()).placeBlockAt(
                             took,
-                            FakePlayerFactory.getMinecraft((WorldServer) world),
+                            FakePlayerFactory.getMinecraft(getWorldServer()),
                             world,
                             front,
                             getDirection(),
@@ -186,7 +188,7 @@ public class NetworkNodeConstructor extends NetworkNode implements IComparable, 
                     } else {
                         world.setBlockState(front, state, 1 | 2);
 
-                        state.getBlock().onBlockPlacedBy(world, front, state, FakePlayerFactory.getMinecraft((WorldServer) world), took);
+                        state.getBlock().onBlockPlacedBy(world, front, state, FakePlayerFactory.getMinecraft(getWorldServer()), took);
                     }
 
                     // From ItemBlock#onItemUse
@@ -387,5 +389,16 @@ public class NetworkNodeConstructor extends NetworkNode implements IComparable, 
     @Override
     public CoverManager getCoverManager() {
         return coverManager;
+    }
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    private WorldServer getWorldServer() {
+        World world = this.world;
+        if (IntegrationMCMP.isLoaded()) {
+            world = RSMCMPAddon.unwrapWorld(world);
+        }
+
+        return (WorldServer) world;
     }
 }

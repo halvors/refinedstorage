@@ -7,6 +7,8 @@ import com.raoulvdberge.refinedstorage.apiimpl.network.node.IGuiReaderWriter;
 import com.raoulvdberge.refinedstorage.apiimpl.network.node.NetworkNodeCraftingMonitor;
 import com.raoulvdberge.refinedstorage.container.*;
 import com.raoulvdberge.refinedstorage.gui.grid.GuiGrid;
+import com.raoulvdberge.refinedstorage.integration.mcmp.IntegrationMCMP;
+import com.raoulvdberge.refinedstorage.integration.mcmp.RSMCMPAddon;
 import com.raoulvdberge.refinedstorage.tile.*;
 import com.raoulvdberge.refinedstorage.tile.craftingmonitor.TileCraftingMonitor;
 import com.raoulvdberge.refinedstorage.tile.craftingmonitor.WirelessCraftingMonitor;
@@ -86,12 +88,12 @@ public class GuiHandler implements IGuiHandler {
             return getCraftingMonitorContainer(player, x, y);
         }
 
-        return getContainer(ID, player, world.getTileEntity(new BlockPos(x, y, z)));
+        return getContainer(ID, player, IntegrationMCMP.isLoaded() ? RSMCMPAddon.unwrapTile(world, new BlockPos(x, y, z)) : world.getTileEntity(new BlockPos(x, y, z)));
     }
 
     @Override
     public Object getClientGuiElement(int ID, EntityPlayer player, World world, int x, int y, int z) {
-        TileEntity tile = world.getTileEntity(new BlockPos(x, y, z));
+        TileEntity tile = IntegrationMCMP.isLoaded() ? RSMCMPAddon.unwrapTile(world, new BlockPos(x, y, z)) : world.getTileEntity(new BlockPos(x, y, z));
 
         switch (ID) {
             case RSGui.CONTROLLER:

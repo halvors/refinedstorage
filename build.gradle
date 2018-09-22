@@ -43,6 +43,10 @@ repositories {
         url "http://dvs1.progwml6.com/files/maven"
     }
     maven {
+        name 'amadornes'
+        url 'http://maven.amadornes.com/'
+    }
+    maven {
         url "http://maven.cil.li"
     }
     maven {
@@ -54,6 +58,7 @@ repositories {
 dependencies {
     deobfCompile "mezz.jei:jei_1.12.2:4.12.0.216:api"
     runtime "mezz.jei:jei_1.12.2:4.12.0.216"
+    deobfCompile "MCMultiPart2:MCMultiPart:2.5.3"
     deobfCompile "li.cil.oc:OpenComputers:MC1.12.2-1.7.2.67:api"
     compile "inventory-tweaks:InventoryTweaks:1.63:api"
 }

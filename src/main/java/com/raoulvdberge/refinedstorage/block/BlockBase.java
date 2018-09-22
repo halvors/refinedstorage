@@ -3,6 +3,8 @@ package com.raoulvdberge.refinedstorage.block;
 import com.raoulvdberge.refinedstorage.RS;
 import com.raoulvdberge.refinedstorage.block.info.BlockDirection;
 import com.raoulvdberge.refinedstorage.block.info.IBlockInfo;
+import com.raoulvdberge.refinedstorage.integration.mcmp.IntegrationMCMP;
+import com.raoulvdberge.refinedstorage.integration.mcmp.RSMCMPAddon;
 import com.raoulvdberge.refinedstorage.item.itemblock.ItemBlockBase;
 import com.raoulvdberge.refinedstorage.render.IModelRegistration;
 import com.raoulvdberge.refinedstorage.tile.TileBase;
@@ -80,7 +82,7 @@ public abstract class BlockBase extends Block {
     @SuppressWarnings("deprecation")
     public IBlockState getActualState(IBlockState state, IBlockAccess world, BlockPos pos) {
         if (getDirection() != null) {
-            TileEntity tile = world.getTileEntity(pos);
+            TileEntity tile = IntegrationMCMP.isLoaded() ? RSMCMPAddon.unwrapTile(world, pos) : world.getTileEntity(pos);
 
             if (tile instanceof TileBase) {
                 return state.withProperty(getDirection().getProperty(), ((TileBase) tile).getDirection());
@@ -125,7 +127,7 @@ public abstract class BlockBase extends Block {
     }
 
     void dropContents(World world, BlockPos pos) {
-        TileEntity tile = world.getTileEntity(pos);
+        TileEntity tile = IntegrationMCMP.isLoaded() ? RSMCMPAddon.unwrapTile(world, pos) : world.getTileEntity(pos);
 
         if (tile instanceof TileBase && ((TileBase) tile).getDrops() != null) {
             WorldUtils.dropInventory(world, pos, ((TileBase) tile).getDrops());

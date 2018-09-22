@@ -9,6 +9,8 @@ import com.raoulvdberge.refinedstorage.block.info.BlockInfoBuilder;
 import com.raoulvdberge.refinedstorage.block.info.IBlockInfo;
 import com.raoulvdberge.refinedstorage.block.property.PropertyObject;
 import com.raoulvdberge.refinedstorage.capability.CapabilityNetworkNodeProxy;
+import com.raoulvdberge.refinedstorage.integration.mcmp.IntegrationMCMP;
+import com.raoulvdberge.refinedstorage.integration.mcmp.RSMCMPAddon;
 import com.raoulvdberge.refinedstorage.render.IModelRegistration;
 import com.raoulvdberge.refinedstorage.render.collision.AdvancedRayTraceResult;
 import com.raoulvdberge.refinedstorage.render.collision.AdvancedRayTracer;
@@ -20,6 +22,7 @@ import com.raoulvdberge.refinedstorage.tile.TileBase;
 import com.raoulvdberge.refinedstorage.tile.TileCable;
 import com.raoulvdberge.refinedstorage.tile.TileNode;
 import com.raoulvdberge.refinedstorage.util.CollisionUtils;
+import com.raoulvdberge.refinedstorage.util.RenderUtils;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.PropertyBool;
@@ -43,9 +46,18 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class BlockCable extends BlockNode {
+    public static final AxisAlignedBB CORE_AABB = RenderUtils.getBounds(6, 6, 6, 10, 10, 10);
+    private static final AxisAlignedBB NORTH_AABB = RenderUtils.getBounds(6, 6, 0, 10, 10, 6);
+    private static final AxisAlignedBB EAST_AABB = RenderUtils.getBounds(10, 6, 6, 16, 10, 10);
+    private static final AxisAlignedBB SOUTH_AABB = RenderUtils.getBounds(6, 6, 10, 10, 10, 16);
+    private static final AxisAlignedBB WEST_AABB = RenderUtils.getBounds(0, 6, 6, 6, 10, 10);
+    private static final AxisAlignedBB UP_AABB = RenderUtils.getBounds(6, 10, 6, 10, 16, 10);
+    private static final AxisAlignedBB DOWN_AABB = RenderUtils.getBounds(6, 0, 6, 10, 6, 10);
+
     public static final PropertyObject<Cover> COVER_NORTH = new PropertyObject<>("cover_north", Cover.class);
     public static final PropertyObject<Cover> COVER_EAST = new PropertyObject<>("cover_east", Cover.class);
     public static final PropertyObject<Cover> COVER_SOUTH = new PropertyObject<>("cover_south", Cover.class);
@@ -116,7 +128,7 @@ public class BlockCable extends BlockNode {
     @Override
     @SuppressWarnings("deprecation")
     public IBlockState getActualState(IBlockState state, IBlockAccess world, BlockPos pos) {
-        TileEntity tile = world.getTileEntity(pos);
+        TileEntity tile = IntegrationMCMP.isLoaded() ? RSMCMPAddon.unwrapTile(world, pos) : world.getTileEntity(pos);
 
         state = super.getActualState(state, world, pos)
             .withProperty(NORTH, hasConnectionWith(world, pos, this, tile, EnumFacing.NORTH))
@@ -147,7 +159,7 @@ public class BlockCable extends BlockNode {
         return s;
     }
 
-    private static boolean hasConnectionWith(IBlockAccess world, BlockPos pos, BlockBase block, TileEntity tile, EnumFacing direction) {
+    public static boolean hasConnectionWith(IBlockAccess world, BlockPos pos, BlockBase block, TileEntity tile, EnumFacing direction) {
         if (!(tile instanceof TileNode)) {
             return false;
         }
@@ -182,6 +194,11 @@ public class BlockCable extends BlockNode {
             return true;
         }
 
+        if (IntegrationMCMP.isLoaded()) {
+            return !RSMCMPAddon.hasObstructingMultipart(tile, Collections.singletonList(BlockCable.getCableExtensionAABB(direction)))
+                    && !RSMCMPAddon.hasObstructingMultipart(otherTile, Collections.singletonList(BlockCable.getCableExtensionAABB(direction.getOpposite())));
+        }
+
         return false;
     }
 
@@ -199,6 +216,10 @@ public class BlockCable extends BlockNode {
         }
 
         return false;
+    }
+
+    public List<AxisAlignedBB> getNonUnionizedCollisionBoxes(IBlockState state) {
+        return Collections.emptyList();
     }
 
     public List<CollisionGroup> getCollisions(TileEntity tile, IBlockState state) {
@@ -367,5 +388,25 @@ public class BlockCable extends BlockNode {
     @SuppressWarnings("deprecation")
     public BlockFaceShape getBlockFaceShape(IBlockAccess worldIn, IBlockState state, BlockPos pos, EnumFacing face) {
         return BlockFaceShape.UNDEFINED;
+    }
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    public static AxisAlignedBB getCableExtensionAABB(EnumFacing facing) {
+        if (facing == EnumFacing.NORTH) {
+            return NORTH_AABB;
+        } else if (facing == EnumFacing.EAST) {
+            return EAST_AABB;
+        } else if (facing == EnumFacing.SOUTH) {
+            return SOUTH_AABB;
+        } else if (facing == EnumFacing.WEST) {
+            return WEST_AABB;
+        } else if (facing == EnumFacing.UP) {
+            return UP_AABB;
+        } else if (facing == EnumFacing.DOWN) {
+            return DOWN_AABB;
+        }
+
+        return NORTH_AABB;
     }
 }

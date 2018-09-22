@@ -5,6 +5,8 @@ import com.raoulvdberge.refinedstorage.api.util.Action;
 import com.raoulvdberge.refinedstorage.api.util.IComparer;
 import com.raoulvdberge.refinedstorage.apiimpl.network.node.cover.CoverManager;
 import com.raoulvdberge.refinedstorage.apiimpl.util.OneSixMigrationHelper;
+import com.raoulvdberge.refinedstorage.integration.mcmp.IntegrationMCMP;
+import com.raoulvdberge.refinedstorage.integration.mcmp.RSMCMPAddon;
 import com.raoulvdberge.refinedstorage.inventory.fluid.FluidInventory;
 import com.raoulvdberge.refinedstorage.inventory.item.ItemHandlerBase;
 import com.raoulvdberge.refinedstorage.inventory.item.ItemHandlerUpgrade;
@@ -150,7 +152,7 @@ public class NetworkNodeDestructor extends NetworkNode implements IComparable, I
                             }
                         }
 
-                        BlockEvent.BreakEvent e = new BlockEvent.BreakEvent(world, front, frontBlockState, FakePlayerFactory.getMinecraft((WorldServer) world));
+                        BlockEvent.BreakEvent e = new BlockEvent.BreakEvent(world, front, frontBlockState, FakePlayerFactory.getMinecraft(getWorldServer()));
 
                         if (!MinecraftForge.EVENT_BUS.post(e)) {
                             world.playEvent(null, 2001, front, Block.getStateId(frontBlockState));
@@ -344,5 +346,17 @@ public class NetworkNodeDestructor extends NetworkNode implements IComparable, I
     @Override
     public CoverManager getCoverManager() {
         return coverManager;
+    }
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    private WorldServer getWorldServer() {
+        World world = this.world;
+
+        if (IntegrationMCMP.isLoaded()) {
+            world = RSMCMPAddon.unwrapWorld(world);
+        }
+
+        return (WorldServer) world;
     }
 }
