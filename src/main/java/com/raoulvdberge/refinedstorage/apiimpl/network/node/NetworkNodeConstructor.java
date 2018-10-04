@@ -139,7 +139,7 @@ public class NetworkNodeConstructor extends NetworkNode implements IComparable, 
                                 world.setBlockState(front, state, 1 | 2);
                             }
                         } else if (upgrades.hasUpgrade(ItemUpgrade.TYPE_CRAFTING)) {
-                            network.getCraftingManager().request(stack, Fluid.BUCKET_VOLUME);
+                            network.getCraftingManager().request(this, stack, Fluid.BUCKET_VOLUME);
                         }
                     }
                 }
@@ -229,7 +229,7 @@ public class NetworkNodeConstructor extends NetworkNode implements IComparable, 
         } else if (upgrades.hasUpgrade(ItemUpgrade.TYPE_CRAFTING)) {
             ItemStack craft = itemFilters.getStackInSlot(0);
 
-            network.getCraftingManager().request(craft, 1);
+            network.getCraftingManager().request(this, craft, 1);
         }
     }
 
@@ -241,7 +241,7 @@ public class NetworkNodeConstructor extends NetworkNode implements IComparable, 
         } else if (upgrades.hasUpgrade(ItemUpgrade.TYPE_CRAFTING)) {
             ItemStack craft = itemFilters.getStackInSlot(0);
 
-            network.getCraftingManager().request(craft, 1);
+            network.getCraftingManager().request(this, craft, 1);
         }
     }
 

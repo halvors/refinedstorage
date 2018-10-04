@@ -712,7 +712,7 @@ public class CraftingTask implements ICraftingTask {
                                 p.setState(ProcessingState.MACHINE_DOES_NOT_ACCEPT);
 
                                 break;
-                            } else if (p.getState() == ProcessingState.READY) { // If the items were ok.
+                            } else if (p.getState() == ProcessingState.READY || p.getItemsToPut().isEmpty()) { // If the items were ok (or if we didn't have items).
                                 p.setState(ProcessingState.READY);
                             }
                         }
@@ -788,6 +788,12 @@ public class CraftingTask implements ICraftingTask {
 
     @Override
     public boolean update() {
+        if (hasMissing()) {
+            LOGGER.warn("Crafting task with missing items or fluids cannot execute, cancelling...");
+
+            return true;
+        }
+
         if (executionStarted == -1) {
             executionStarted = System.currentTimeMillis();
         }
@@ -1189,6 +1195,11 @@ public class CraftingTask implements ICraftingTask {
     @Override
     public IStackList<ItemStack> getMissing() {
         return missing;
+    }
+
+    @Override
+    public IStackList<FluidStack> getMissingFluids() {
+        return missingFluids;
     }
 
     @Override
