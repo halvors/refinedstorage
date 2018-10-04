@@ -50,13 +50,13 @@ import java.util.Collections;
 import java.util.List;
 
 public class BlockCable extends BlockNode {
-    public static final AxisAlignedBB CORE_AABB = RenderUtils.getBounds(6, 6, 6, 10, 10, 10);
-    private static final AxisAlignedBB NORTH_AABB = RenderUtils.getBounds(6, 6, 0, 10, 10, 6);
-    private static final AxisAlignedBB EAST_AABB = RenderUtils.getBounds(10, 6, 6, 16, 10, 10);
-    private static final AxisAlignedBB SOUTH_AABB = RenderUtils.getBounds(6, 6, 10, 10, 10, 16);
-    private static final AxisAlignedBB WEST_AABB = RenderUtils.getBounds(0, 6, 6, 6, 10, 10);
-    private static final AxisAlignedBB UP_AABB = RenderUtils.getBounds(6, 10, 6, 10, 16, 10);
-    private static final AxisAlignedBB DOWN_AABB = RenderUtils.getBounds(6, 0, 6, 10, 6, 10);
+    public static final AxisAlignedBB CORE_AABB = getBounds(6, 6, 6, 10, 10, 10);
+    private static final AxisAlignedBB NORTH_AABB = getBounds(6, 6, 0, 10, 10, 6);
+    private static final AxisAlignedBB EAST_AABB = getBounds(10, 6, 6, 16, 10, 10);
+    private static final AxisAlignedBB SOUTH_AABB = getBounds(6, 6, 10, 10, 10, 16);
+    private static final AxisAlignedBB WEST_AABB = getBounds(0, 6, 6, 6, 10, 10);
+    private static final AxisAlignedBB UP_AABB = getBounds(6, 10, 6, 10, 16, 10);
+    private static final AxisAlignedBB DOWN_AABB = getBounds(6, 0, 6, 10, 6, 10);
 
     public static final PropertyObject<Cover> COVER_NORTH = new PropertyObject<>("cover_north", Cover.class);
     public static final PropertyObject<Cover> COVER_EAST = new PropertyObject<>("cover_east", Cover.class);
@@ -391,6 +391,10 @@ public class BlockCable extends BlockNode {
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    public static AxisAlignedBB getBounds(int fromX, int fromY, int fromZ, int toX, int toY, int toZ) {
+        return new AxisAlignedBB((float) fromX / 16F, (float) fromY / 16F, (float) fromZ / 16F, (float) toX / 16F, (float) toY / 16F, (float) toZ / 16F);
+    }
 
     public static AxisAlignedBB getCableExtensionAABB(EnumFacing facing) {
         if (facing == EnumFacing.NORTH) {
