@@ -191,12 +191,12 @@ public class BlockCable extends BlockNode {
                 return false;
             }
 
-            return true;
-        }
+            if (IntegrationMCMP.isLoaded()) {
+                return !RSMCMPAddon.hasObstructingMultipart(tile, Collections.singletonList(BlockCable.getCableExtensionAABB(direction)))
+                        && !RSMCMPAddon.hasObstructingMultipart(otherTile, Collections.singletonList(BlockCable.getCableExtensionAABB(direction.getOpposite())));
+            }
 
-        if (IntegrationMCMP.isLoaded()) {
-            return !RSMCMPAddon.hasObstructingMultipart(tile, Collections.singletonList(BlockCable.getCableExtensionAABB(direction)))
-                    && !RSMCMPAddon.hasObstructingMultipart(otherTile, Collections.singletonList(BlockCable.getCableExtensionAABB(direction.getOpposite())));
+            return true;
         }
 
         return false;
