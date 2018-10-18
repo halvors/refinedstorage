@@ -148,13 +148,16 @@ public class NetworkNodeCrafter extends NetworkNode implements ICraftingPatternC
     protected void onConnectedStateChange(INetwork network, boolean state) {
         super.onConnectedStateChange(network, state);
 
-        if (!state) {
-            network.getCraftingManager().getTasks().stream()
-                .filter(task -> task.getPattern().getContainer().getPosition().equals(pos))
-                .forEach(task -> network.getCraftingManager().cancel(task.getId()));
-        }
-
         network.getCraftingManager().rebuild();
+    }
+
+    @Override
+    public void onDisconnected(INetwork network) {
+        super.onDisconnected(network);
+
+        network.getCraftingManager().getTasks().stream()
+            .filter(task -> task.getPattern().getContainer().getPosition().equals(pos))
+            .forEach(task -> network.getCraftingManager().cancel(task.getId()));
     }
 
     @Override
@@ -286,7 +289,7 @@ public class NetworkNodeCrafter extends NetworkNode implements ICraftingPatternC
         }
 
         if (facing != null) {
-            return world.getBlockState(pos.offset(getDirection())).getBlock().getTranslationKey() + ".name";
+            return world.getBlockState(facing.getPos()).getBlock().getTranslationKey() + ".name";
         }
 
         return DEFAULT_NAME;

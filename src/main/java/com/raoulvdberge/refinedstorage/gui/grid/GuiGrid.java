@@ -306,7 +306,7 @@ public class GuiGrid extends GuiBase implements IResizableDisplay {
             drawTexture(x + 172, y + getTopHeight() + (getVisibleRows() * 18) + 22, 240, ty * 16, 16, 16);
         }
 
-        tabs.drawForeground(x, y - tabs.getHeight(), mouseX, mouseY);
+        tabs.drawForeground(x, y - tabs.getHeight(), mouseX, mouseY, true);
 
         if (searchField != null) {
             searchField.drawTextBox();
@@ -437,8 +437,6 @@ public class GuiGrid extends GuiBase implements IResizableDisplay {
         } else if (grid.isActive()) {
             if (clickedClear && grid instanceof IGridNetworkAware) {
                 RS.INSTANCE.network.sendToServer(new MessageGridClear());
-
-                MessageGridClear.clear((IGridNetworkAware) grid, null); // Clear clientside
             }
 
             ItemStack held = ((ContainerGrid) this.inventorySlots).getPlayer().inventory.getItemStack();
