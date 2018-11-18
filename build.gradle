@@ -16,7 +16,7 @@ apply plugin: 'maven'
 apply plugin: 'maven-publish'
 apply plugin: 'net.minecraftforge.gradle.forge'
 
-version = "1.6.9-mcpc"
+version = "1.6.10-mcpc"
 
 def env = System.getenv()
 if (env.BUILD_NUMBER) {

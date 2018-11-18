@@ -2,6 +2,7 @@ package com.raoulvdberge.refinedstorage.container;
 
 import com.raoulvdberge.refinedstorage.api.network.grid.GridType;
 import com.raoulvdberge.refinedstorage.api.network.grid.IGrid;
+import com.raoulvdberge.refinedstorage.api.network.grid.IGridCraftingListener;
 import com.raoulvdberge.refinedstorage.api.network.grid.handler.IFluidGridHandler;
 import com.raoulvdberge.refinedstorage.api.network.grid.handler.IItemGridHandler;
 import com.raoulvdberge.refinedstorage.api.storage.IStorageCache;
@@ -25,11 +26,12 @@ import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.inventory.IContainerListener;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
+import net.minecraft.network.play.server.SPacketSetSlot;
 import net.minecraftforge.items.SlotItemHandler;
 
 import javax.annotation.Nullable;
 
-public class ContainerGrid extends ContainerBase {
+public class ContainerGrid extends ContainerBase implements IGridCraftingListener {
     private IGrid grid;
     private IStorageCache cache;
     private IStorageCacheListener listener;
@@ -45,6 +47,8 @@ public class ContainerGrid extends ContainerBase {
         this.display = display;
 
         initSlots();
+
+        grid.addCraftingListener(this);
     }
 
     public void initSlots() {
@@ -73,8 +77,6 @@ public class ContainerGrid extends ContainerBase {
                     if (slot == craftingResultSlot) {
                         grid.onCraftedShift(getPlayer());
 
-                        sendCraftingSlots();
-
                         detectAndSendChanges();
                     } else {
                         ItemStack stack = slot.getStack();
@@ -92,6 +94,11 @@ public class ContainerGrid extends ContainerBase {
                                 slot.putStack(itemHandler.onShiftClick((EntityPlayerMP) getPlayer(), stack));
                             } else if (slot instanceof SlotGridCrafting && mergeItemStack(stack, 14, 14 + (9 * 4), false)) {
                                 slot.onSlotChanged();
+
+                                // This is needed because when a grid is disconnected,
+                                // and a player shift clicks from the matrix to the inventory (this if case),
+                                // the crafting inventory isn't being notified.
+                                grid.onCraftingMatrixChanged();
                             }
                         }
 
@@ -199,13 +206,17 @@ public class ContainerGrid extends ContainerBase {
         return grid;
     }
 
-    public void sendCraftingSlots() {
+    @Override
+    public void onCraftingMatrixChanged() {
         for (int i = 0; i < inventorySlots.size(); ++i) {
             Slot slot = inventorySlots.get(i);
 
-            if (slot instanceof SlotGridCrafting || slot == craftingResultSlot) {
+            if (slot instanceof SlotGridCrafting || slot == craftingResultSlot || slot == patternResultSlot) {
                 for (IContainerListener listener : listeners) {
-                    listener.sendSlotContents(this, i, slot.getStack());
+                    // @Volatile: We can't use IContainerListener#sendSlotContents since EntityPlayerMP blocks SlotCrafting changes...
+                    if (listener instanceof EntityPlayerMP) {
+                        ((EntityPlayerMP) listener).connection.sendPacket(new SPacketSetSlot(windowId, i, slot.getStack()));
+                    }
                 }
             }
         }
@@ -246,6 +257,8 @@ public class ContainerGrid extends ContainerBase {
                 cache.removeListener(listener);
             }
         }
+
+        grid.removeCraftingListener(this);
     }
 
     @Override

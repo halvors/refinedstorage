@@ -2,6 +2,7 @@ package com.raoulvdberge.refinedstorage.apiimpl.network.node;
 
 import com.raoulvdberge.refinedstorage.RS;
 import com.raoulvdberge.refinedstorage.RSBlocks;
+import com.raoulvdberge.refinedstorage.api.network.node.INetworkNodeCable;
 import com.raoulvdberge.refinedstorage.apiimpl.network.node.cover.CoverManager;
 import com.raoulvdberge.refinedstorage.block.BlockCable;
 import com.raoulvdberge.refinedstorage.integration.mcmp.IntegrationMCMP;
@@ -15,7 +16,7 @@ import net.minecraftforge.items.IItemHandler;
 
 import javax.annotation.Nullable;
 
-public class NetworkNodeCable extends NetworkNode implements ICoverable {
+public class NetworkNodeCable extends NetworkNode implements ICoverable, INetworkNodeCable {
     public static final String ID = "cable";
 
     private static final String NBT_COVERS = "Covers";

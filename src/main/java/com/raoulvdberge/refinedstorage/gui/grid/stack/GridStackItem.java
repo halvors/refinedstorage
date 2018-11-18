@@ -9,6 +9,8 @@ import com.raoulvdberge.refinedstorage.util.StackUtils;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.item.ItemStack;
+import net.minecraftforge.fml.common.Loader;
+import net.minecraftforge.fml.common.ModContainer;
 import net.minecraftforge.oredict.OreDictionary;
 
 import javax.annotation.Nullable;
@@ -24,6 +26,9 @@ public class GridStackItem implements IGridStack {
     private String[] oreIds = null;
     @Nullable
     private IStorageTracker.IStorageTrackerEntry entry;
+    private String modId;
+    private String modName;
+    private String tooltip;
 
     public GridStackItem(ItemStack stack) {
         this.stack = stack;
@@ -39,6 +44,16 @@ public class GridStackItem implements IGridStack {
         if (buf.readBoolean()) {
             this.entry = new StorageTrackerEntry(buf);
         }
+    }
+
+    @Nullable
+    static String getModNameByModId(String modId) {
+        ModContainer container = Loader.instance().getActiveModList().stream()
+            .filter(m -> m.getModId().toLowerCase().equals(modId))
+            .findFirst()
+            .orElse(null);
+
+        return container == null ? null : container.getName();
     }
 
     public ItemStack getStack() {
@@ -84,7 +99,28 @@ public class GridStackItem implements IGridStack {
 
     @Override
     public String getModId() {
-        return stack.getItem().getCreatorModId(stack);
+        if (modId == null) {
+            modId = stack.getItem().getCreatorModId(stack);
+
+            if (modId == null) {
+                modId = "???";
+            }
+        }
+
+        return modId;
+    }
+
+    @Override
+    public String getModName() {
+        if (modName == null) {
+            modName = getModNameByModId(getModId());
+
+            if (modName == null) {
+                modName = "???";
+            }
+        }
+
+        return modName;
     }
 
     @Override
@@ -102,11 +138,15 @@ public class GridStackItem implements IGridStack {
 
     @Override
     public String getTooltip() {
-        try {
-            return RenderUtils.getItemTooltip(stack).stream().collect(Collectors.joining("\n"));
-        } catch (Throwable t) {
-            return "";
+        if (tooltip == null) {
+            try {
+                tooltip = RenderUtils.getItemTooltip(stack).stream().collect(Collectors.joining("\n"));
+            } catch (Throwable t) {
+                tooltip = "";
+            }
         }
+
+        return tooltip;
     }
 
     @Override

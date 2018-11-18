@@ -116,15 +116,11 @@ public abstract class TileBase extends TileEntity {
         return null;
     }
 
+    // @Volatile: Copied with some changes from the super method (avoid sending neighbor updates, it's not needed)
     @Override
-    public boolean equals(Object o) {
-        return o instanceof TileBase && ((TileBase) o).getPos().equals(pos) && ((TileBase) o).world.provider.getDimension() == world.provider.getDimension();
-    }
-
-    @Override
-    public int hashCode() {
-        int result = pos.hashCode();
-        result = 31 * result + world.provider.getDimension();
-        return result;
+    public void markDirty() {
+        if (world != null) {
+            world.markChunkDirty(pos, this);
+        }
     }
 }

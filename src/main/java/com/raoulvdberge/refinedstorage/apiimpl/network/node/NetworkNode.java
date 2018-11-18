@@ -4,6 +4,7 @@ import com.raoulvdberge.refinedstorage.RS;
 import com.raoulvdberge.refinedstorage.api.network.INetwork;
 import com.raoulvdberge.refinedstorage.api.network.INetworkNodeVisitor;
 import com.raoulvdberge.refinedstorage.api.network.node.INetworkNode;
+import com.raoulvdberge.refinedstorage.api.util.Action;
 import com.raoulvdberge.refinedstorage.apiimpl.API;
 import com.raoulvdberge.refinedstorage.apiimpl.util.OneSixMigrationHelper;
 import com.raoulvdberge.refinedstorage.tile.config.RedstoneMode;
@@ -39,7 +40,13 @@ public abstract class NetworkNode implements INetworkNode, INetworkNodeVisitor {
 
     private EnumFacing direction = EnumFacing.NORTH;
 
-    private boolean throttlingDisabled;
+    // Disable throttling for the first tick.
+    // This is to make sure couldUpdate is going to be correctly set.
+    // If we place 2 blocks next to each other, and disconnect the first one really fast,
+    // the second one would not realize it has been disconnected because couldUpdate == canUpdate.
+    // It would however still have the connected state, due to the initial block update packet.
+    // The couldUpdate/canUpdate system is separate from that.
+    private boolean throttlingDisabled = true;
     private boolean couldUpdate;
     private int ticksSinceUpdateChanged;
 
@@ -124,7 +131,7 @@ public abstract class NetworkNode implements INetworkNode, INetworkNodeVisitor {
     public void update() {
         ++ticks;
 
-        boolean canUpdate = getNetwork() != null && canUpdate();
+        boolean canUpdate = canUpdate();
 
         if (couldUpdate != canUpdate) {
             ++ticksSinceUpdateChanged;
@@ -142,7 +149,7 @@ public abstract class NetworkNode implements INetworkNode, INetworkNodeVisitor {
                     onConnectedStateChange(network, canUpdate);
 
                     if (shouldRebuildGraphOnChange()) {
-                        network.getNodeGraph().rebuild();
+                        network.getNodeGraph().invalidate(Action.PERFORM, network.world(), network.getPosition());
                     }
                 }
             }

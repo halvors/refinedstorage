@@ -1,7 +1,28 @@
 # Refined Storage Changelog
 
+### 1.6.10
+- Fixed client FPS stalling when using "@" mod search in the Grid (raoulvdberge)
+- Fixed client FPS stalling when using "#" tooltip search in the Grid (raoulvdberge)
+- Fixed fluid inputs/outputs in the Pattern Grid not being set when you re-insert a Pattern with fluid inputs/outputs (raoulvdberge)
+- Fixed bug where the Pattern Grid doesn't update it's output slot when manually configuring a crafting pattern (raoulvdberge)
+- Fixed network node scanning allowing multiple controllers in some cases (raoulvdberge)
+- Fixed OpenComputers integration not giving back a crafting task instance in the schedule task API (raoulvdberge)
+- Fixed OpenComputers integration causing log spam when getting processing patterns (raoulvdberge)
+- Fixed OpenComputers voiding items with extract item API when there is no inventory space (raoulvdberge)
+- Fixed CraftingTweaks buttons resetting sometimes in the Crafting Grid (raoulvdberge)
+- Fixed Refined Storage jars not being signed (raoulvdberge)
+- Fixed crafting task stalling when there's not enough space in the inventory (raoulvdberge)
+- Fixed another duplication bug with a disconnected Crafting Grid (raoulvdberge)
+- Fixed oredict mode in autocrafting not working at all (raoulvdberge)
+- Removed getMissingItems() and getMissingFluids() functions from the OpenComputers integration, that info is now accessible through schedule(Fluid)Task(). If you just want to check if there are missing items/fluids but don't want to start an actual task, use the "canSchedule" parameter (raoulvdberge)
+- Updated Russian translation (kellixon)
+- Added fluid functions for the fluid autocrafting to the OpenComputers integration (raoulvdberge)
+
 ### 1.6.9
 - Fixed OpenComputers "unknown error" when using extract item API (raoulvdberge)
+- Fixed client FPS stuttering when opening a Crafting Grid (raoulvdberge)
+- Fixed rare Grid crashing issue (raoulvdberge)
+- You can now interact with the fluid container input slot in the Fluid Interface (raoulvdberge)
 
 ### 1.6.8
 - Fixed Ender IO incompatibility (raoulvdberge)

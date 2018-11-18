@@ -4,6 +4,7 @@ import com.raoulvdberge.refinedstorage.api.storage.IStorageTracker;
 import com.raoulvdberge.refinedstorage.apiimpl.API;
 import com.raoulvdberge.refinedstorage.gui.GuiBase;
 import net.minecraft.client.resources.I18n;
+import net.minecraftforge.fluids.FluidRegistry;
 import net.minecraftforge.fluids.FluidStack;
 
 import javax.annotation.Nullable;
@@ -15,6 +16,8 @@ public class GridStackFluid implements IGridStack {
     private IStorageTracker.IStorageTrackerEntry entry;
     private boolean craftable;
     private boolean displayCraftText;
+    private String modId;
+    private String modName;
 
     public GridStackFluid(int hash, FluidStack stack, @Nullable IStorageTracker.IStorageTrackerEntry entry, boolean craftable, boolean displayCraftText) {
         this.hash = hash;
@@ -55,7 +58,28 @@ public class GridStackFluid implements IGridStack {
 
     @Override
     public String getModId() {
-        return stack.getFluid().getStill(stack).getNamespace();
+        if (modId == null) {
+            modId = FluidRegistry.getModId(stack);
+
+            if (modId == null) {
+                modId = "???";
+            }
+        }
+
+        return modId;
+    }
+
+    @Override
+    public String getModName() {
+        if (modName == null) {
+            modName = GridStackItem.getModNameByModId(getModId());
+
+            if (modName == null) {
+                modName = "???";
+            }
+        }
+
+        return modName;
     }
 
     @Override

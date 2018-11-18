@@ -1,35 +1,39 @@
 package com.raoulvdberge.refinedstorage.gui.grid.filtering;
 
 import com.raoulvdberge.refinedstorage.gui.grid.stack.IGridStack;
-import net.minecraftforge.fml.common.Loader;
-import net.minecraftforge.fml.common.ModContainer;
 
 import java.util.function.Predicate;
 
 public class GridFilterMod implements Predicate<IGridStack> {
-    private String modName;
+    private String inputModName;
 
-    public GridFilterMod(String modName) {
-        this.modName = modName.toLowerCase().replace(" ", "");
-    }
-
-    private String getModNameFromModId(String id) {
-        ModContainer container = Loader.instance().getActiveModList().stream()
-            .filter(m -> m.getModId().toLowerCase().equals(id))
-            .findFirst()
-            .orElse(null);
-
-        return container == null ? id : container.getName().toLowerCase().replace(" ", "");
+    public GridFilterMod(String inputModName) {
+        this.inputModName = standardify(inputModName);
     }
 
     @Override
     public boolean test(IGridStack stack) {
-        String otherModId = stack.getModId().toLowerCase();
+        String modId = stack.getModId();
 
-        if (!getModNameFromModId(otherModId).contains(modName)) {
-            return stack.getModId().contains(modName);
+        if (modId != null) {
+            if (modId.contains(inputModName)) {
+                return true;
+            }
+
+            String modName = stack.getModName();
+            if (modName != null) {
+                modName = standardify(modName);
+
+                if (modName.contains(inputModName)) {
+                    return true;
+                }
+            }
         }
 
-        return true;
+        return false;
+    }
+
+    private String standardify(String input) {
+        return input.toLowerCase().replace(" ", "");
     }
 }

@@ -12,8 +12,6 @@ import com.raoulvdberge.refinedstorage.capability.CapabilityNetworkNodeProxy;
 import com.raoulvdberge.refinedstorage.integration.mcmp.IntegrationMCMP;
 import com.raoulvdberge.refinedstorage.integration.mcmp.RSMCMPAddon;
 import com.raoulvdberge.refinedstorage.render.IModelRegistration;
-import com.raoulvdberge.refinedstorage.render.collision.AdvancedRayTraceResult;
-import com.raoulvdberge.refinedstorage.render.collision.AdvancedRayTracer;
 import com.raoulvdberge.refinedstorage.render.collision.CollisionGroup;
 import com.raoulvdberge.refinedstorage.render.constants.ConstantsCable;
 import com.raoulvdberge.refinedstorage.render.model.baked.BakedModelCableCover;
@@ -30,15 +28,11 @@ import net.minecraft.block.state.BlockFaceShape;
 import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
-import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.EnumFacing;
-import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.RayTraceResult;
-import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.common.property.IExtendedBlockState;
@@ -222,6 +216,7 @@ public class BlockCable extends BlockNode {
         return Collections.emptyList();
     }
 
+    @Override
     public List<CollisionGroup> getCollisions(TileEntity tile, IBlockState state) {
         List<CollisionGroup> groups = getCoverCollisions(tile);
 
@@ -335,24 +330,6 @@ public class BlockCable extends BlockNode {
         }
 
         return groups;
-    }
-
-    @Override
-    @SuppressWarnings("deprecation")
-    public void addCollisionBoxToList(IBlockState state, World world, BlockPos pos, AxisAlignedBB entityBox, List<AxisAlignedBB> collidingBoxes, Entity entityIn, boolean isActualState) {
-        for (CollisionGroup group : getCollisions(world.getTileEntity(pos), this.getActualState(state, world, pos))) {
-            for (AxisAlignedBB aabb : group.getItems()) {
-                addCollisionBoxToList(pos, entityBox, collidingBoxes, aabb);
-            }
-        }
-    }
-
-    @Override
-    @SuppressWarnings("deprecation")
-    public RayTraceResult collisionRayTrace(IBlockState state, World world, BlockPos pos, Vec3d start, Vec3d end) {
-        AdvancedRayTraceResult result = AdvancedRayTracer.rayTrace(pos, start, end, getCollisions(world.getTileEntity(pos), this.getActualState(state, world, pos)));
-
-        return result != null ? result.getHit() : null;
     }
 
     @Override

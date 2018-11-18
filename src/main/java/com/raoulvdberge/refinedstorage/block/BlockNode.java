@@ -2,6 +2,7 @@ package com.raoulvdberge.refinedstorage.block;
 
 import com.raoulvdberge.refinedstorage.api.network.node.INetworkNode;
 import com.raoulvdberge.refinedstorage.api.network.node.INetworkNodeManager;
+import com.raoulvdberge.refinedstorage.api.util.Action;
 import com.raoulvdberge.refinedstorage.apiimpl.API;
 import com.raoulvdberge.refinedstorage.block.info.IBlockInfo;
 import com.raoulvdberge.refinedstorage.integration.mcmp.IntegrationMCMP;
@@ -54,7 +55,7 @@ public abstract class BlockNode extends BlockNodeProxy {
         manager.markForSaving();
 
         if (node != null && node.getNetwork() != null) {
-            node.getNetwork().getNodeGraph().rebuild();
+            node.getNetwork().getNodeGraph().invalidate(Action.PERFORM, node.getNetwork().world(), node.getNetwork().getPosition());
         }
     }
 
