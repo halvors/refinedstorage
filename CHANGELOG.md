@@ -1,5 +1,20 @@
 # Refined Storage Changelog
 
+### 1.6.13
+- Fixed Interface with Crafting Upgrade being stuck if an earlier item configuration has missing items or fluids (raoulvdberge)
+- Added keybindings to open wireless items. The default one set to open a Wireless Grid is CTRL + G (raoulvdberge)
+
+### 1.6.12
+- Increased the speed of autocrafting (raoulvdberge)
+- Fixed External Storage sending storage updates when it is disabled (raoulvdberge)
+- Fixed slight performance issue with loading Crafters from disk (raoulvdberge)
+- Fixed storage GUIs overflowing on large numbers (raoulvdberge)
+- Added a completion percentage to the Crafting Monitor (raoulvdberge)
+- Updated Russian translation (kellixon)
+
+### 1.6.11
+- Fixed blocks neighboring a controller breaking when returning from a dimension in a unchunkloaded area (raoulvdberge)
+
 ### 1.6.10
 - Fixed client FPS stalling when using "@" mod search in the Grid (raoulvdberge)
 - Fixed client FPS stalling when using "#" tooltip search in the Grid (raoulvdberge)
@@ -15,8 +30,11 @@
 - Fixed another duplication bug with a disconnected Crafting Grid (raoulvdberge)
 - Fixed oredict mode in autocrafting not working at all (raoulvdberge)
 - Removed getMissingItems() and getMissingFluids() functions from the OpenComputers integration, that info is now accessible through schedule(Fluid)Task(). If you just want to check if there are missing items/fluids but don't want to start an actual task, use the "canSchedule" parameter (raoulvdberge)
+- Removed the Interdimensional Upgrade, Network Transmitters are now cross dimensional by default (raoulvdberge)
+- Removed the per block FE cost of the Network Transmitter, it draws a fixed amount of FE/t now (raoulvdberge)
 - Updated Russian translation (kellixon)
 - Added fluid functions for the fluid autocrafting to the OpenComputers integration (raoulvdberge)
+- Slightly increased performance of the External Storage (raoulvdberge)
 
 ### 1.6.9
 - Fixed OpenComputers "unknown error" when using extract item API (raoulvdberge)
