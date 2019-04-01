@@ -30,6 +30,7 @@ import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTUtil;
+import net.minecraft.server.management.PlayerProfileCache;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntitySkull;
 import net.minecraft.util.EnumFacing;
@@ -41,6 +42,7 @@ import net.minecraft.world.WorldServer;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.util.BlockSnapshot;
 import net.minecraftforge.common.util.Constants;
+import net.minecraftforge.common.util.FakePlayer;
 import net.minecraftforge.common.util.FakePlayerFactory;
 import net.minecraftforge.event.world.BlockEvent;
 import net.minecraftforge.fluids.Fluid;
@@ -50,6 +52,7 @@ import net.minecraftforge.items.IItemHandlerModifiable;
 import net.minecraftforge.items.wrapper.CombinedInvWrapper;
 
 import javax.annotation.Nullable;
+import java.util.UUID;
 
 public class NetworkNodeConstructor extends NetworkNode implements IComparable, IType, ICoverable {
     public static final String ID = "constructor";
@@ -147,8 +150,21 @@ public class NetworkNodeConstructor extends NetworkNode implements IComparable, 
         }
     }
 
+    private FakePlayer getFakePlayer() {
+        WorldServer world = (WorldServer) this.world;
+        UUID owner = getOwner();
+        if (owner != null) {
+            PlayerProfileCache profileCache = world.getMinecraftServer().getPlayerProfileCache();
+            GameProfile profile = profileCache.getProfileByUUID(owner);
+            if (profile != null) {
+                return FakePlayerFactory.get(world, profile);
+            }
+        }
+        return FakePlayerFactory.getMinecraft(world);
+    }
+
     private boolean canPlace(BlockPos pos, IBlockState state) {
-        BlockEvent.PlaceEvent e = new BlockEvent.PlaceEvent(new BlockSnapshot(world, pos, state), world.getBlockState(pos), FakePlayerFactory.getMinecraft(getWorldServer()), EnumHand.MAIN_HAND);
+        BlockEvent.PlaceEvent e = new BlockEvent.PlaceEvent(new BlockSnapshot(world, pos, state), world.getBlockState(pos), getFakePlayer(), EnumHand.MAIN_HAND);
 
         return !MinecraftForge.EVENT_BUS.post(e);
     }
@@ -176,7 +192,7 @@ public class NetworkNodeConstructor extends NetworkNode implements IComparable, 
                     if (item.getItem() instanceof ItemBlock) {
                         ((ItemBlock) item.getItem()).placeBlockAt(
                             took,
-                            FakePlayerFactory.getMinecraft(getWorldServer()),
+                            getFakePlayer(),
                             world,
                             front,
                             getDirection(),

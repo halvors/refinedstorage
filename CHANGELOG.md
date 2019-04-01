@@ -1,8 +1,18 @@
 # Refined Storage Changelog
 
+### 1.6.14
+- Fixed server crash (raoulvdberge)
+
 ### 1.6.13
 - Fixed Interface with Crafting Upgrade being stuck if an earlier item configuration has missing items or fluids (raoulvdberge)
-- Added keybindings to open wireless items. The default one set to open a Wireless Grid is CTRL + G (raoulvdberge)
+- Added keybindings to open wireless items. The default one set to open a Wireless Crafting Grid from Refined Storage Addons is CTRL + G (raoulvdberge)
+- Added Grid quantity formatting for item counts over 1 billion (raoulvdberge)
+- Updated German translation (cydhra)
+- Updated Chinese translation (KoderX)
+- Fixed wrong item count for oredict patterns (the-eater)
+- Fixed autocrafting duplication bug (Radviger / notcake)
+- Fixed Crafting Pattern not rendering tile entity items like a chest (zhykzhykzhyk / raoulvdberge)
+- Let Constructor and Destructor interact with world using their owner's profile (Radviger)
 
 ### 1.6.12
 - Increased the speed of autocrafting (raoulvdberge)
